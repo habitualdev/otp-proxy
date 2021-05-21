@@ -109,7 +109,7 @@ if __name__ == '__main__':
     qr_data.add_data(otp_outer.provisioning_uri(name="roaldi@github.com", issuer_name="Proxy OTP"))
     qr_data.make(fit=True)
     qr_img = qr_data.make_image()
-    qr_img.save("qrcode.jpg")
+    qr_img.save("qrcode.png")
     while True:
 
         otp_num = str(otp_outer.now())[-4:]

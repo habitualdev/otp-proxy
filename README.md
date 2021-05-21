@@ -6,3 +6,4 @@ remains open when the code rolls, but all following connections must use a new p
 TO DO
 - Add qr code generator to dump OTP qr code to current dir
 - Add option for random string seed
+- Log to file in a standardized format rather than stdout

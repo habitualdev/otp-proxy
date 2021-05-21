@@ -1,17 +1,22 @@
 #!/usr/bin/python
-# This is a simple port-forward / proxy, written using only the default python
-# library. If you want to make a suggestion or fix something you can contact-me
 
+# Simple tcp proxy that changes the external port that is open based off of a OTP
+
+import os.path
 import socket
 import select
 import time
 import sys
 import pyotp
+import qrcode
+import PIL
 
 # Changing the buffer_size and delay, you can improve the speed and bandwidth.
-# But when buffer get to high or delay go too down, you can broke things
+# But when buffer get to high or delay go too down, you can break things
 buffer_size = 4096
 delay = 0.0001
+
+# Default set to forward to SSH, but proxy is "dumb" enough it should work for anything
 forward_to = ('127.0.0.1', 22)
 
 class Forward:
@@ -97,15 +102,22 @@ class TheServer:
         self.channel[self.s].send(data)
 
 if __name__ == '__main__':
-        seed = "Test"
-        while True:
-            otp_outer=pyotp.TOTP(seed)
-            otp_num = str(otp_outer.now())[-4:]
-            server = TheServer('', int(otp_num), seed)
+    # Seed can be changed to anything.
+    seed = "LongRandomString"
+    otp_outer = pyotp.TOTP(seed)
+    qr_data = qrcode.QRCode(version=1, error_correction=qrcode.constants.ERROR_CORRECT_M, box_size=10, border=4,)
+    qr_data.add_data(otp_outer.provisioning_uri(name="roaldi@github.com", issuer_name="Proxy OTP"))
+    qr_data.make(fit=True)
+    qr_img = qr_data.make_image()
+    qr_img.save("qrcode.jpg")
+    while True:
 
-            try:
-                server.main_loop(server.totp)
+        otp_num = str(otp_outer.now())[-4:]
+        server = TheServer('', int(otp_num), seed)
 
-            except KeyboardInterrupt:
-                print("Ctrl C - Stopping server")
-                sys.exit(1)
+        try:
+            server.main_loop(server.totp)
+
+        except KeyboardInterrupt:
+            print("Ctrl C - Stopping server")
+            sys.exit(1)

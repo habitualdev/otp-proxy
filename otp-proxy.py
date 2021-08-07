@@ -11,13 +11,20 @@ import pyotp
 import qrcode
 import PIL
 
+if sys.argv[0] == "otp-proxy.py":
+    portnum = sys.argv[1]
+else:
+    portnum = sys.argv[0]
+
+
+
 # Changing the buffer_size and delay, you can improve the speed and bandwidth.
 # But when buffer get to high or delay go too down, you can break things
 buffer_size = 4096
 delay = 0.0001
 
 # Default set to forward to SSH, but proxy is "dumb" enough it should work for anything
-forward_to = ('127.0.0.1', 22)
+forward_to = ('127.0.0.1', portnum)
 
 class Forward:
     def __init__(self):
